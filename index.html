@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог приложений</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #ffffff; color: #111111; padding: 24px 16px; line-height: 1.5; }
+    .container { max-width: 760px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #e5e5e5; margin-bottom: 20px; }
+    h1 { font-size: 20px; font-weight: 600; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; border: 1px solid #d4d4d4; background: #fafafa; color: #111; }
+    .btn:hover { background: #f0f0f0; }
+    .btn-dark { background: #111111; color: #ffffff; border-color: #111111; }
+    .btn-dark:hover { background: #333333; }
+    .search { width: 100%; padding: 10px 12px; border: 1px solid #d4d4d4; border-radius: 6px; font-size: 14px; margin-bottom: 20px; outline: none; }
+    .search:focus { border-color: #111111; }
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .item { border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .item-info { flex: 1; min-width: 220px; }
+    .title { font-size: 16px; font-weight: 600; }
+    .meta { font-size: 12px; color: #666666; margin-top: 2px; }
+    .desc { font-size: 14px; color: #333333; margin-top: 8px; }
+    .status { color: #666666; font-size: 14px; padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Каталог приложений</h1>
+      <div class="nav">
+        <a href="https://t.me" target="_blank" class="btn">Добавить приложение</a>
+        <button onclick="copyRepo()" class="btn btn-dark">Репозиторий для Droid-ify</button>
+      </div>
+    </header>
+
+    <input type="text" id="search" class="search" placeholder="Поиск по названию..." oninput="filterApps()">
+    <div id="status" class="status">Загрузка списка...</div>
+    <div id="list" class="list"></div>
+  </div>
+
+  <script>
+    const REPO_URL = "https://githubusercontent.com";
+    const FULL_REPO_LINK = REPO_URL + "?fingerprint=E6AC30AD00C45531139FA1791577A461B310D051916A8B5B44007BD6046761AA";
+    let allApps = [];
+
+    function copyRepo() {
+      navigator.clipboard.writeText(FULL_REPO_LINK);
+      alert("Ссылка скопирована. Вставьте её в Droid-ify.");
+    }
+
+    async function loadStore() {
+      try {
+        const res = await fetch(REPO_URL + "/index-v2.json?t=" + Date.now());
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const packages = data.packages || {};
+
+        allApps = Object.keys(packages).map(pkgName => {
+          const pkg = packages[pkgName];
+          const meta = pkg.metadata || {};
+          const versions = pkg.versions || {};
+          const latestKey = Object.keys(versions)[0];
+          const latest = latestKey ? versions[latestKey] : null;
+
+          const nameObj = meta.name || {};
+          const title = nameObj["ru-RU"] || nameObj["ru"] || nameObj["en-US"] || Object.values(nameObj)[0] || pkgName;
+
+          const descObj = meta.summary || meta.description || {};
+          const desc = descObj["ru-RU"] || descObj["ru"] || descObj["en-US"] || Object.values(descObj)[0] || "";
+
+          const apkFile = latest && latest.file ? REPO_URL + latest.file.name : "#";
+          const verName = latest && latest.manifest ? latest.manifest.versionName : "1.0";
+
+          return { title, desc, apkFile, verName, pkgName };
+        });
+
+        document.getElementById("status").style.display = "none";
+        renderApps(allApps);
+      } catch (e) {
+        document.getElementById("status").innerText = "Список пуст или база ещё обновляется.";
+      }
+    }
+
+    function renderApps(list) {
+      const container = document.getElementById("list");
+      container.innerHTML = "";
+      if (list.length === 0) {
+        container.innerHTML = '<div class="status">Ничего не найдено.</div>';
+        return;
+      }
+      list.forEach(app => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="item-info">
+            <div class="title">${app.title}</div>
+            <div class="meta">Версия ${app.verName} · ${app.pkgName}</div>
+            ${app.desc ? `<div class="desc">${app.desc}</div>` : ""}
+          </div>
+          <a href="${app.apkFile}" class="btn btn-dark">Скачать APK</a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterApps() {
+      const q = document.getElementById("search").value.toLowerCase();
+      renderApps(allApps.filter(a => a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q)));
+    }
+
+    loadStore();
+  </script>
+</body>
+</html>
