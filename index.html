@@ -4,54 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DropApp — Каталог приложений</title>
+    <link rel="icon" type="image/png" href="raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/fdroid/repo/icons/dropiconl.png">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #e5e5ea; padding-bottom: 15px; }
-        h1 { margin: 0; font-size: 26px; }
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn { padding: 10px 16px; border-radius: 10px; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-outline { background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7; }
-        .btn-outline:hover { background: #f0f0f5; }
-        .btn-dark { background: #1d1d1f; color: #fff; }
-        .btn-dark:hover { background: #333; }
-        .search { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid #d2d2d7; font-size: 16px; box-sizing: border-box; margin-bottom: 25px; outline: none; }
-        .search:focus { border-color: #0071e3; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-        .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; }
-        .card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
-        .card-icon { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background: #eee; }
-        .card-title { font-weight: 600; font-size: 17px; margin: 0 0 4px 0; }
-        .card-pkg { font-size: 12px; color: #86868b; word-break: break-all; }
-        .card-desc { font-size: 14px; color: #424245; margin-bottom: 16px; line-height: 1.4; }
-        .btn-install { display: block; text-align: center; background: #0071e3; color: #fff; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 500; }
-        .btn-install:hover { background: #0077ed; }
-        .status { color: #6e6e73; font-size: 15px; }
+        :root {
+            --bg: #0f1115;
+            --surface: #181b21;
+            --surface-hover: #22262f;
+            --border: #2a2f3a;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #22c55e;
+            --accent-hover: #16a34a;
+            --primary: #3b82f6;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px 16px;
+        }
+        .container { max-width: 980px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+        .brand img {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: var(--surface);
+        }
+        .brand h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 11px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover { background: var(--surface-hover); }
+        .btn-client {
+            background: var(--accent);
+            color: #052e16;
+            border: none;
+        }
+        .btn-client:hover { background: var(--accent-hover); color: #fff; }
+        .search {
+            width: 100%;
+            padding: 15px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 24px;
+            outline: none;
+        }
+        .search:focus { border-color: var(--primary); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .card:hover { background: var(--surface-hover); transform: translateY(-2px); }
+        .card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .card-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: #232730;
+            flex-shrink: 0;
+        }
+        .card-title { margin: 0 0 4px 0; font-size: 18px; font-weight: 600; }
+        .card-meta { font-size: 13px; color: var(--text-muted); }
+        .card-summary {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 18px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .btn-wide {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            display: block;
+            transition: 0.2s;
+        }
+        .btn-green { background: var(--accent); color: #052e16; }
+        .btn-green:hover { background: var(--accent-hover); color: #fff; }
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+        .btn-secondary:hover { background: var(--surface-hover); }
+
+        /* Страница игры (широкий макет как на скриншоте) */
+        .detail-view { display: none; }
+        .detail-back { margin-bottom: 18px; }
+        .detail-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 32px 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .detail-icon {
+            width: 96px;
+            height: 96px;
+            border-radius: 22px;
+            object-fit: cover;
+            background: #232730;
+            margin: 0 auto 16px auto;
+            display: block;
+        }
+        .detail-title { margin: 0 0 6px 0; font-size: 28px; font-weight: 700; }
+        .detail-pkg { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
+            gap: 10px;
+        }
+        .stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-val { font-size: 15px; font-weight: 600; }
+        .detail-desc-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 20px;
+            line-height: 1.6;
+            color: #d1d5db;
+            white-space: pre-line;
+        }
+        .status { color: var(--text-muted); font-size: 15px; padding: 20px 0; }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>DropApp — Каталог</h1>
-        <div class="actions">
-            <a href="https://t.me" target="_blank" class="btn btn-outline">Добавить приложение</a>
-            <button onclick="copyRepo()" class="btn btn-dark">Репозиторий для DropApp</button>
+        <div class="brand" onclick="showCatalog()">
+            <img src="raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/fdroid/repo/icons/dropiconl.png" alt="DropApp" onerror="this.style.display='none'">
+            <h1>DropApp</h1>
+        </div>
+        <div class="header-actions">
+            <a href="raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/DropApp.apk" class="btn btn-client" download>Скачать DropApp</a>
+            <button onclick="copyRepo()" class="btn">Репозиторий</button>
+            <a href="https://t.me" target="_blank" class="btn">Добавить приложение</a>
         </div>
     </header>
 
-    <input type="text" id="search" class="search" placeholder="Поиск по названию..." oninput="renderApps()">
-    <div id="status" class="status">Загрузка каталога...</div>
-    <div id="grid" class="grid"></div>
+    <!-- Главный экран: каталог -->
+    <div id="catalog-view">
+        <input type="text" id="search" class="search" placeholder="Поиск по названию..." oninput="renderApps()">
+        <div id="status" class="status">Загрузка каталога...</div>
+        <div id="grid" class="grid"></div>
+    </div>
+
+    <!-- Страница игры (широкий макет) -->
+    <div id="detail-view" class="detail-view">
+        <div class="detail-back">
+            <button onclick="showCatalog()" class="btn">Назад в каталог</button>
+        </div>
+        <div class="detail-hero">
+            <img id="d-icon" class="detail-icon" src="" alt="" onerror="this.style.display='none'">
+            <h2 id="d-title" class="detail-title"></h2>
+            <div id="d-pkg" class="detail-pkg"></div>
+            <div class="detail-stats">
+                <div>
+                    <div class="stat-label">Версия</div>
+                    <div id="d-ver" class="stat-val">—</div>
+                </div>
+                <div>
+                    <div class="stat-label">Размер</div>
+                    <div id="d-size" class="stat-val">—</div>
+                </div>
+                <div>
+                    <div class="stat-label">Платформа</div>
+                    <div class="stat-val">Android</div>
+                </div>
+            </div>
+        </div>
+
+        <a id="d-download-client" href="https://raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/DropApp.apk" class="btn-wide btn-green" download>Скачать DropApp</a>
+        <a id="d-download-apk" href="#" class="btn-wide btn-secondary" download>Скачать APK напрямую</a>
+
+        <div id="d-desc" class="detail-desc-box"></div>
+    </div>
 </div>
 
 <script>
-    const REPO_URL = "https://githubusercontent.com";
+    const REPO_URL = "https://raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/fdroid/repo";
     const FULL_REPO_LINK = REPO_URL + "?fingerprint=AC1FBE685451705B7C820184AF3A51AC4FE7689398BEFF710F0697FF1C102C3F";
     let allApps = [];
 
     function copyRepo() {
         navigator.clipboard.writeText(FULL_REPO_LINK);
         alert("Ссылка на репозиторий DropApp скопирована!\nВставьте её в приложении в разделе Репозитории.");
+    }
+
+    function formatBytes(bytes) {
+        if (!bytes) return "—";
+        const mb = bytes / (1024 * 1024);
+        return mb.toFixed(1) + " МБ";
     }
 
     function getLocalized(obj) {
@@ -64,7 +269,7 @@
         const statusEl = document.getElementById("status");
         try {
             const res = await fetch(REPO_URL + "/index-v2.json?t=" + Date.now());
-            if (!res.ok) throw new Error("Файл индекса не найден");
+            if (!res.ok) throw new Error("Индекс не найден");
             const data = await res.json();
             const packages = data.packages || {};
 
@@ -84,8 +289,10 @@
                 return {
                     id: pkgName,
                     name: getLocalized(meta.name) || pkgName,
-                    summary: getLocalized(meta.summary) || getLocalized(meta.description) || "Приложение из каталога DropApp",
-                    version: latest?.manifest?.versionName || "",
+                    summary: getLocalized(meta.summary) || "Приложение из каталога DropApp",
+                    description: getLocalized(meta.description) || getLocalized(meta.summary) || "Описание отсутствует.",
+                    version: latest?.manifest?.versionName || "1.0",
+                    size: formatBytes(latest?.file?.size),
                     icon: iconUrl,
                     apk: apkUrl
                 };
@@ -110,24 +317,53 @@
         allApps.filter(a => a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q)).forEach(app => {
             const card = document.createElement("div");
             card.className = "card";
+            card.onclick = () => openDetail(app);
             card.innerHTML = `
                 <div>
-                    <div class="card-header">
+                    <div class="card-top">
                         ${app.icon ? `<img src="${app.icon}" class="card-icon" onerror="this.style.display='none'">` : ""}
                         <div>
                             <h3 class="card-title">${app.name}</h3>
-                            <div class="card-pkg">${app.id} ${app.version ? "• v" + app.version : ""}</div>
+                            <div class="card-meta">v${app.version} • ${app.size}</div>
                         </div>
                     </div>
-                    <div class="card-desc">${app.summary}</div>
+                    <div class="card-summary">${app.summary}</div>
                 </div>
-                <a href="${app.apk}" class="btn-install">Скачать APK</a>
+                <a href="raw.githubusercontent.com/standkasai4-ship-it/f-droid-repo-template/main/DropApp.apk" class="btn-wide btn-green" onclick="event.stopPropagation()" download>Скачать</a>
             `;
             grid.appendChild(card);
         });
+    }
+
+    function openDetail(app) {
+        document.getElementById("catalog-view").style.display = "none";
+        const detail = document.getElementById("detail-view");
+        detail.style.display = "block";
+
+        const iconEl = document.getElementById("d-icon");
+        if (app.icon) {
+            iconEl.src = app.icon;
+            iconEl.style.display = "block";
+        } else {
+            iconEl.style.display = "none";
+        }
+
+        document.getElementById("d-title").textContent = app.name;
+        document.getElementById("d-pkg").textContent = app.id;
+        document.getElementById("d-ver").textContent = app.version;
+        document.getElementById("d-size").textContent = app.size;
+        document.getElementById("d-desc").textContent = app.description;
+        document.getElementById("d-download-apk").href = app.apk;
+        window.scrollTo(0, 0);
+    }
+
+    function showCatalog() {
+        document.getElementById("detail-view").style.display = "none";
+        document.getElementById("catalog-view").style.display = "block";
     }
 
     loadRepo();
 </script>
 </body>
 </html>
+
