@@ -35,6 +35,6 @@ jobs:
           cd ..
           git config --global user.name "Bot"
           git config --global user.email "bot@github.com"
-          git add fdroid/index* fdroid/config.yml fdroid/keystore.p12 || true
-          git commit -m "Update" || exit 0
+          git add fdroid/repo/* fdroid/metadata/* fdroid/config.yml fdroid/keystore.p12 || true
+          git commit -m "Update repo index" || exit 0
           git push
