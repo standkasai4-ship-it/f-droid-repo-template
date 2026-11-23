@@ -5,6 +5,8 @@ on:
     paths:
       - 'fdroid/repo/*.apk'
       - '.github/workflows/*'
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -15,19 +17,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           sudo apt-get update
           sudo apt-get install -y fdroidserver default-jdk-headless
           mkdir -p fdroid/repo
-          cd fdroid
+          cd fdroid/repo
+          gh release list --repo ${{ github.repository }} --limit 20 --json tagName -q '.[].tagName' | while read tag; do
+            gh release download "$tag" --repo ${{ github.repository }} --pattern "*.apk" --clobber || true
+          done
+          cd ..
           if [ ! -f config.yml ]; then
             fdroid init --repo-keyalias myrepo --no-prompt
           fi
           fdroid update --create-metadata --use-date-from-apk
-          keytool -list -v -keystore keystore.p12 -storepass $(grep keystorepass config.yml | awk '{print $2}') -storetype PKCS12 | grep "SHA256:"
           cd ..
           git config --global user.name "Bot"
           git config --global user.email "bot@github.com"
-          git add fdroid/
+          git add fdroid/index* fdroid/config.yml fdroid/keystore.p12 || true
           git commit -m "Update" || exit 0
           git push
